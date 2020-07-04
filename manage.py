@@ -9,8 +9,16 @@ try:
 except psycopg2.DatabaseError as err:
     print('Error %s' % err)
 
-
-reader = csv.reader(open('ibrd.csv', 'r'), delimiter=',')
+# data supplier is PI would name file with date and name as (YYYYMMDDD_ibrd.csv)
+csv_filename = 'ibrd.csv'
+cur.execute(
+    "insert into data_loading_log(file_name, time_started) values ('%s', now())" % csv_filename)
+conn.commit()
+# get most recent log id
+cur.execute("select max(log_id) from data_loading_log")
+result = cur.fetchone()
+log_id = result[0]
+reader = csv.reader(open(csv_filename, 'r'), delimiter=',')
 for index, row in enumerate(reader):
     if index == 0:
         continue
@@ -164,3 +172,7 @@ for index, row in enumerate(reader):
         print("Loan Details Error Occurred: ", err)
     # if index > 7:
     #   exit()
+# update after process ends
+cur.execute(
+    "update data_loading_log set time_finished = now() where log_id = %d" % log_id)
+conn.commit()
