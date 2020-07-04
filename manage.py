@@ -409,3 +409,112 @@ def get_total_loan_types():
 rows = get_total_loan_types()
 for row in rows:
     print(row)
+
+
+# Loans taked by each Country
+
+
+def get_total_loan_per_ctry():
+    total_loan_per_ctry = """select TEMP.country_name, count(TEMP.loan_number) from 
+        (select distinct on(LN.loan_number) C.country_name, LN.loan_number from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN where 
+        C.country_id=LN.fk_country_id) AS TEMP group by country_name"""
+
+    cur.execute(total_loan_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_total_loan_per_ctry()
+for row in rows:
+    print(row)
+
+# Count for all Loan statuses in file
+
+
+def get_total_loan_statuses():
+    total_loan_statuses = """select derived_status, count(*) from (select distinct on(loan_number) loan_status AS derived_status, * from ibrd_ug.loan) AS TEMP
+    group by TEMP.derived_status"""
+
+    cur.execute(total_loan_statuses)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_total_loan_statuses()
+for row in rows:
+    print(row)
+
+
+# Missing Values: Count for loan numbers without guarantor
+
+
+def get_loan_without_guarantor():
+    loan_without_guarantor = """select count(*) from (select distinct on(LN.loan_number) loan_number from ibrd_ug.loan LN, ibrd_ug.guarantor G where LN.fk_guarantor_id=G.guarantor_id and guarantor = '') AS TEMP"""
+
+    cur.execute(loan_without_guarantor)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_loan_without_guarantor()
+for row in rows:
+    print(row)
+
+
+# Missing Values: Count for loan numbers without borrower name
+
+
+def get_loan_without_borrower_name():
+    loan_without_borrower_name = """select count(*) from (select distinct on(LN.loan_number) loan_number from ibrd_ug.loan LN, ibrd_ug.borrower B where LN.fk_borrower_id=B.borrower_id and borrower = '') AS TEMP"""
+
+    cur.execute(loan_without_borrower_name)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_loan_without_borrower_name()
+for row in rows:
+    print(row)
+
+# Maximum amount taken by a country
+
+
+def get_max_loan_per_ctry():
+    max_loan_per_ctry = """select TEMP.country_name, max(TEMP.disbursed_amount) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(max_loan_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_max_loan_per_ctry()
+for row in rows:
+    print(row)
+
+# Minimum amount taken by a country
+
+
+def get_min_loan_per_ctry():
+    min_loan_per_ctry = """select TEMP.country_name, min(TEMP.disbursed_amount) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(min_loan_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_min_loan_per_ctry()
+for row in rows:
+    print(row)
