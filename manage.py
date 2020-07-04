@@ -21,6 +21,7 @@ cur.execute("select max(log_id) from data_loading_log")
 result = cur.fetchone()
 log_id = result[0]
 reader = csv.reader(open(csv_filename, 'r'), delimiter=',')
+num_of_rows = 0
 for index, row in enumerate(reader):
     if index == 0:
         continue
@@ -174,12 +175,17 @@ for index, row in enumerate(reader):
 
     except:
         print("Loan Details Error Occurred: ", err)
-    # if index > 7:
-    #   exit()
+
+    num_of_rows += 1
+    print(num_of_rows)
+# if index > 7:
+#   exit()
 # update after process ends
 cur.execute(
-    "update data_loading_log set time_finished = now() where log_id = %d" % log_id)
+    "update data_loading_log set time_finished = now(), records_processed = %d where log_id = %d" % (num_of_rows, log_id))
 conn.commit()
+
+# Average for original_principal_amount
 
 
 def get_averages_per_country():
@@ -195,5 +201,211 @@ def get_averages_per_country():
 
 
 rows = get_averages_per_country()
+for row in rows:
+    print(row)
+
+# Average for cancelled_amount
+
+
+def get_averages_cancelled_amount_per_country():
+    average_cancelled_amount_per_ctry = """select TEMP.country_name, avg(TEMP.cancelled_amount) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.cancelled_amount from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_cancelled_amount_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_cancelled_amount_per_country()
+for row in rows:
+    print(row)
+
+# Average for undisbursed_amount
+
+
+def get_averages_undisbursed_amount_per_country():
+    average_undisbursed_amount_per_ctry = """select TEMP.country_name, avg(TEMP.undisbursed_amount) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.undisbursed_amount from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_undisbursed_amount_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_undisbursed_amount_per_country()
+for row in rows:
+    print(row)
+
+# Average for disbursed_amount
+
+
+def get_averages_disbursed_amount_per_country():
+    average_disbursed_amount_per_ctry = """select TEMP.country_name, avg(TEMP.disbursed_amount) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_disbursed_amount_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_disbursed_amount_per_country()
+for row in rows:
+    print(row)
+
+# Average for repaid_to_ibrd
+
+
+def get_averages_repaid_to_ibrd_per_country():
+    average_repaid_to_ibrd_per_ctry = """select TEMP.country_name, avg(TEMP.repaid_to_ibrd) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.repaid_to_ibrd from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_repaid_to_ibrd_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_repaid_to_ibrd_per_country()
+for row in rows:
+    print(row)
+
+# Average for due_to_ibrd
+
+
+def get_averages_due_to_ibrd_per_country():
+    average_due_to_ibrd_per_ctry = """select TEMP.country_name, avg(TEMP.due_to_ibrd) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.due_to_ibrd from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_due_to_ibrd_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_due_to_ibrd_per_country()
+for row in rows:
+    print(row)
+
+# Average for exchange_adjustment
+
+
+def get_averages_exchange_adjustment_per_country():
+    average_exchange_adjustment_per_ctry = """select TEMP.country_name, avg(TEMP.exchange_adjustment) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.exchange_adjustment from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_exchange_adjustment_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_exchange_adjustment_per_country()
+for row in rows:
+    print(row)
+
+# Average for sold_3rd_party
+
+
+def get_averages_sold_3rd_party_per_country():
+    average_sold_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.sold_3rd_party) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.sold_3rd_party from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_sold_3rd_party_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_sold_3rd_party_per_country()
+for row in rows:
+    print(row)
+
+# Average for repaid_3rd_party
+
+
+def get_averages_repaid_3rd_party_per_country():
+    average_repaid_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.repaid_3rd_party) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.repaid_3rd_party from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_repaid_3rd_party_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_repaid_3rd_party_per_country()
+for row in rows:
+    print(row)
+
+# Average for due_3rd_party
+
+
+def get_averages_due_3rd_party_per_country():
+    average_due_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.due_3rd_party) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.due_3rd_party from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_due_3rd_party_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_due_3rd_party_per_country()
+for row in rows:
+    print(row)
+
+# Average for loans_held
+
+
+def get_averages_loans_held_per_country():
+    average_loans_held_per_ctry = """select TEMP.country_name, avg(TEMP.loans_held) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.loans_held from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_loans_held_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_loans_held_per_country()
+for row in rows:
+    print(row)
+
+# All Loan types submitted in current raw file
+
+
+def get_total_loan_types():
+    total_loan_type = """select DISTINCT loan_type from ibrd_ug.loan"""
+
+    cur.execute(total_loan_type)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_total_loan_types()
 for row in rows:
     print(row)
