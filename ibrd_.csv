@@ -1,0 +1,9 @@
+End of Period,Interest Rate,Currency of Commitment,Project ID,Project Name,Original Principal Amount,Cancelled Amount,Undisbursed Amount,Disbursed Amount,Repaid to IBRD,Due to IBRD,Exchange Adjustment,Sold 3rd Party,Repaid 3rd Party,Due 3rd Party,First Repayment Date,Last Repayment Date,Agreement Signing Date,Board Approval Date,Effective Date (Most Recent),Closed Date (Most Recent),Last Disbursement Date,,
+,,,,,,,,,,,,,,,,,,,,,,,
+table,,,,,,,,,,,,,,,,,,,,,,,
+region,"region_id, region_name",,,,,,,,,,,,,,,,,,,,,,
+Country,"country_id, country_name, fk_region, country_code",,,,,,,,,,,,,,,,,,,,,,
+Loan,"Load_id, Loan number, Loan_type, Loan status, fk_borrower_id, fk_region_id",,,,,,,,,,,,,,,,,,,,,,
+Guarantor,"Gurantor_id, Guarantor, Guarantor_country_code, ",,,,,,,,,,,,,,,,,,,,,,
+Borrower,"Borrower_id,Borrower, Borrower's Obligation, Loans Held",,,,,,,,,,,,,,,,,,,,,,
+Loan_details,"fk_load_id, ",End of Period,Interest Rate,Currency of Commitment,Project ID,Project Name,Original Principal Amount,Cancelled Amount,Undisbursed Amount,Disbursed Amount,Repaid to IBRD,Due to IBRD,Exchange Adjustment,Sold 3rd Party,Repaid 3rd Party,Due 3rd Party,First Repayment Date,Last Repayment Date,Agreement Signing Date,Board Approval Date,Effective Date (Most Recent),Closed Date (Most Recent),Last Disbursement Date
