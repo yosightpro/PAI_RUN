@@ -1,5 +1,7 @@
 import csv
 import psycopg2
+#from statistics import get_averages_per_country
+
 
 try:
     conn = psycopg2.connect(dbname="IBRD", host="localhost",
@@ -30,6 +32,7 @@ for index, row in enumerate(reader):
     guarantor_country_code = row[6]
     guarantor_name = row[7].replace("'", "")
     loan_number = row[1]
+    loan_type = row[8]
     loan_status = row[9]
     end_of_period = row[0]
     interest_rate = row[10]
@@ -43,17 +46,18 @@ for index, row in enumerate(reader):
     repaid_to_ibrd = row[18]
     due_to_ibrd = row[19]
     exchange_adjustment = row[20]
-    sold_3rd_party = row[21]
-    repaid_3rd_party = row[22]
-    due_3rd_party = row[23]
-    loans_held = row[24]
-    first_repayment_date = row[25]
-    last_repayment_date = row[26]
-    agreement_signing_date = row[27]
-    board_approval_date = row[28]
-    effective_date_most_recent = row[29]
-    closed_date_most_recent = row[30]
-    last_disbursement_date = row[31]
+    borrowers_obligation = [21]
+    sold_3rd_party = row[22]
+    repaid_3rd_party = row[23]
+    due_3rd_party = row[24]
+    loans_held = row[25]
+    first_repayment_date = row[26]
+    last_repayment_date = row[27]
+    agreement_signing_date = row[28]
+    board_approval_date = row[29]
+    effective_date_most_recent = row[30]
+    closed_date_most_recent = row[31]
+    last_disbursement_date = row[32]
     # Region
 # REGION
     try:
@@ -86,7 +90,7 @@ for index, row in enumerate(reader):
         if result:
             ctry_id = result[0]
         else:  # country doesnt exist yet, create it
-            insert_country = "INSERT INTO country (country_name, country_code, fk_region_id) VALUES ('%s', '%s', '%s')" % (
+            insert_country = "INSERT INTO country (country_name, country_code, fk_region_id) VALUES ('%s', '%s', %d)" % (
                 country_name, country_code, region_id)
             cur.execute(insert_country)
             conn.commit()
@@ -109,8 +113,8 @@ for index, row in enumerate(reader):
         if result:
             borrower_id = result[0]
         else:  # borrower doesnt exist yet, create it
-            insert_borrower = "INSERT INTO borrower (borrower) VALUES ('%s')" % (
-                borrower)
+            insert_borrower = "INSERT INTO borrower (borrower, borrowers_obligation) VALUES ('%s', '%s')" % (
+                borrower, borrowers_obligation)
             cur.execute(insert_borrower)
             conn.commit()
 
@@ -147,9 +151,9 @@ for index, row in enumerate(reader):
         print("Guarantor Error Occurred: ", err)
    # LOAN
     try:
-        insert_loan = """INSERT INTO loan (loan_number, loan_status, 
-            fk_borrower_id, fk_region_id, fk_guarantor_id) VALUES 
-            ('%s', '%s', '%d', '%d', '%d')""" % (loan_number, loan_status, borrower_id, region_id, guarantor_id)
+        insert_loan = """INSERT INTO loan (loan_number, loan_status, loan_type, 
+            fk_borrower_id, fk_region_id, fk_guarantor_id, fk_country_id) VALUES 
+            ('%s', '%s', '%s', %d, %d, %d, %d)""" % (loan_number, loan_status, loan_type, borrower_id, region_id, guarantor_id, ctry_id)
         cur.execute(insert_loan)
         conn.commit()
         # fetch most recent loan entry just created. Since there are monthly insertions with same loan number
@@ -163,7 +167,7 @@ for index, row in enumerate(reader):
 
         # LOAN DETAILS
     try:
-        insert_details = """insert into loan_details (fk_loan_id,end_of_period,interest_rate,currencyof_commitment,project_id,project_name,original_principal_amount,cancelled_amount,undisbursed_amount,disbursed_amount,repaid_to_ibrd,due_to_ibrd,exchange_adjustment,sold_3rd_party,repaid_3rd_party,due_3rd_party,first_repayment_date,last_repayment_date,agreement_signing_date,board_approval_date,effective_date_most_recent,closed_date_most_recent,last_disbursement_date,loans_held) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" % (
+        insert_details = """insert into loan_details (fk_loan_id,end_of_period,interest_rate,currencyof_commitment,project_id,project_name,original_principal_amount,cancelled_amount,undisbursed_amount,disbursed_amount,repaid_to_ibrd,due_to_ibrd,exchange_adjustment,sold_3rd_party,repaid_3rd_party,due_3rd_party,first_repayment_date,last_repayment_date,agreement_signing_date,board_approval_date,effective_date_most_recent,closed_date_most_recent,last_disbursement_date,loans_held) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" % (
             loan_id, end_of_period, interest_rate, currencyof_commitment, project_id, project_name, original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount, repaid_to_ibrd, due_to_ibrd, exchange_adjustment, sold_3rd_party, repaid_3rd_party, due_3rd_party, first_repayment_date, last_repayment_date, agreement_signing_date, board_approval_date, effective_date_most_recent, closed_date_most_recent, last_disbursement_date, loans_held)
         cur.execute(insert_details)
         conn.commit()
@@ -176,3 +180,20 @@ for index, row in enumerate(reader):
 cur.execute(
     "update data_loading_log set time_finished = now() where log_id = %d" % log_id)
 conn.commit()
+
+
+def get_averages_per_country():
+    average_principal_per_ctry = """select TEMP.country_name, avg(TEMP.original_principal_amount) from 
+        (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount from 
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
+
+    cur.execute(average_principal_per_ctry)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rows = get_averages_per_country()
+for row in rows:
+    print(row)
