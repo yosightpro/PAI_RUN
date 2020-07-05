@@ -1,6 +1,10 @@
 import csv
 import psycopg2
 from xlwt import Workbook
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from datetime import datetime
 
 
@@ -589,3 +593,23 @@ avg_header = ["Total Count", ""]
 generate_excel(avg_header, rowsmissingb, main_workbook, "Missing Borrower")
 
 main_workbook.save("Summary.xls")
+
+
+def send_email(recepient, msg_body):
+   # today = date.today()
+    msg = MIMEMultipart()
+    msg["From"] = 'develop.emailer@gmail.com'
+    msg["To"] = recepient
+    msg["Subject"] = "Summary for File"
+    msg.attach(MIMEText(msg_body, "plain"))
+
+    # smtp.gmail.com is gmails mail server, Compuscans would need to use its own
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login('develop.emailer@gmail.com', 'fordevelop22')
+    server.sendmail('develop.emailer@gmail.com', recepient, msg.as_string())
+    server.quit()
+
+
+message_body = "Good day, \nYour recent monthly file has been processed successfully.\nRefer to the SFTP directory for results. \n\n Regards\n Data Team"
+send_email("develop.emailer@gmail.com", message_body)
