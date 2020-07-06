@@ -214,7 +214,7 @@ def generate_excel(headers_one, batch_one, main_workbook, sheet_name):
 
 
 def get_process_summary():
-    process_summary = "Select file_name, time_started, time_finished, records_processed from ibrd_ug.data_loading_log where log_id = 21"  # % log_id
+    process_summary = "Select file_name, time_started, time_finished, records_processed from ibrd_ug.data_loading_log where log_id = %d" % log_id
 
     cur.execute(process_summary)
     avg_rows = cur.fetchall()
@@ -226,10 +226,50 @@ rowsprocessed = get_process_summary()
 avg_header = ["File Name", "Time Started",
               "Fime_Finished", "Records Rrocessed"]
 generate_excel(avg_header, rowsprocessed, main_workbook, "Process Summary")
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("OUTPUT/OUTPUT SUMMARY.xls")
 
+# Missing Values: Count for loan numbers without guarantor
+
+
+def get_loan_without_guarantor():
+    loan_without_guarantor = """select count(*) from (select distinct on(LN.loan_number) loan_number from ibrd_ug.loan LN, ibrd_ug.guarantor G where LN.fk_guarantor_id=G.guarantor_id and guarantor = '') AS TEMP"""
+
+    cur.execute(loan_without_guarantor)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rowsmissing = get_loan_without_guarantor()
+avg_header = ["Total Count", ""]
+generate_excel(avg_header, rowsmissing, main_workbook,
+               "Total Loans Without Guarantor")
+
+main_workbook.save("OUTPUT/OUTPUT SUMMARY.xls")
+
+
+# Missing Values: Count for loan numbers without borrower name
+
+
+def get_loan_without_borrower_name():
+    loan_without_borrower_name = """select count(*) from (select distinct on(LN.loan_number) loan_number from ibrd_ug.loan LN, ibrd_ug.borrower B where LN.fk_borrower_id=B.borrower_id and borrower = '') AS TEMP"""
+
+    cur.execute(loan_without_borrower_name)
+    avg_rows = cur.fetchall()
+
+    return avg_rows
+
+
+rowsmissingb = get_loan_without_borrower_name()
+avg_header = ["Total Count", ""]
+generate_excel(avg_header, rowsmissingb, main_workbook,
+               "Total Loans Without Borrower")
+
+main_workbook.save("OUTPUT/OUTPUT SUMMARY.xls")
 
 # # Average for original_principal_amount
+
+
 def get_averages_per_country():
     average_principal_per_ctry = """select TEMP.country_name, avg(TEMP.original_principal_amount) from
         (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount from
@@ -598,6 +638,10 @@ chart1.set_y_axis({'name': 'Amount'})
 
 # Set an Excel chart style. Colors with white outline and shadow.
 chart1.set_style(10)
+# Insert the chart into the worksheet (with an offset).
+worksheet.insert_chart('G2', chart1, {'x_offset': 25, 'y_offset': 10})
+
+workbook.close()
 # Loans taked by each Country
 
 
@@ -613,11 +657,8 @@ def get_total_loan_per_ctry():
     return avg_rows
 
 
-rows = get_total_loan_per_ctry()
-avg_header = ["Country", "Total Loans Per Country"]
-generate_excel(avg_header, rows, main_workbook, "total_loans")
+rowsTake = get_total_loan_per_ctry()
 
-main_workbook.save("OUTPUT/Summary.xls")
 # Maximum amount taken by a country
 
 
@@ -633,11 +674,7 @@ def get_max_loan_per_ctry():
     return avg_rows
 
 
-rows = get_max_loan_per_ctry()
-avg_header = ["Country", "Maximum Disbursed Amount"]
-generate_excel(avg_header, rows, main_workbook, "maximum_disbursed_amount")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsMax = get_max_loan_per_ctry()
 
 # Minimum amount taken by a country
 
@@ -654,13 +691,52 @@ def get_min_loan_per_ctry():
     return avg_rows
 
 
-rows = get_min_loan_per_ctry()
-avg_header = ["Country", "Minimum Disbursed Amount"]
-generate_excel(avg_header, rows, main_workbook, "minimum_disbursed_amount")
+rowsMin = get_min_loan_per_ctry()
 
-main_workbook.save("OUTPUT/Summary.xls")
+# ONE WORKBOOK FOR LOANS TAKEN, MAXIMUM AND MINIMUM DISBURSED AMOUNT
+amountM = {}
+countries = [item[0] for item in rowsTake]
+for item in rowsTake:
+    if amountM.get("loan_number"):
+        amountM["loan_number"].append(item[1])
+    else:
+        amountM["loan_number"] = [item[1]]
+for item in rowsMax:
+    if amountM.get("disbursed_amount"):
+        amountM["disbursed_amount"].append(item[1])
+    else:
+        amountM["disbursed_amount"] = [item[1]]
+for item in rowsMin:
+    if amountM.get("min_disbursed_amount"):
+        amountM["min_disbursed_amount"].append(item[1])
+    else:
+        amountM["min_disbursed_amount"] = [item[1]]
 
+workbook = xlsxwriter.Workbook(
+    'OUTPUT/LOAN STATISTICS MIN AND MAX DISBURSED AMOUNTS.xlsx')
+worksheet = workbook.add_worksheet()
+bold = workbook.add_format({'bold': .5})
 
+# Add the worksheet data that the charts will refer to.
+headings = ['Country', 'Total Loans Taken',
+            'Maximum Disbursed Amount', 'Minimum Disbursed Amount']
+data = [
+    countries,  # countries
+    amountM["loan_number"],  # original_principal_amount
+    amountM["disbursed_amount"],  # max_disbursed_amount
+    amountM["min_disbursed_amount"],  # min_disbursed_amount
+]
+
+worksheet.write_row('A1', headings, bold)
+worksheet.write_column('A2', data[0])
+worksheet.write_column('B2', data[1])
+worksheet.write_column('C2', data[2])
+worksheet.write_column('D2', data[3])
+
+# Create a new chart object. In this case an embedded chart.
+
+workbook.close()
+##
 # All Loan types submitted in current raw file
 
 
@@ -677,7 +753,7 @@ rowstypes = get_total_loan_types()
 avg_header = ["Loan Types", ""]
 generate_excel(avg_header, rowstypes, main_workbook, "loan_types")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("OUTPUT/OUTPUT SUMMARY.xls")
 
 # Count for all Loan statuses in file
 
@@ -696,52 +772,7 @@ rowstatuses = get_total_loan_statuses()
 avg_header = ["Loan Status", "Total Count"]
 generate_excel(avg_header, rowstatuses, main_workbook, "loan_statuses")
 
-main_workbook.save("OUTPUT/Summary.xls")
-
-
-# Missing Values: Count for loan numbers without guarantor
-
-
-def get_loan_without_guarantor():
-    loan_without_guarantor = """select count(*) from (select distinct on(LN.loan_number) loan_number from ibrd_ug.loan LN, ibrd_ug.guarantor G where LN.fk_guarantor_id=G.guarantor_id and guarantor = '') AS TEMP"""
-
-    cur.execute(loan_without_guarantor)
-    avg_rows = cur.fetchall()
-
-    return avg_rows
-
-
-rowsmissing = get_loan_without_guarantor()
-avg_header = ["Total Count", ""]
-generate_excel(avg_header, rowsmissing, main_workbook, "Missing Guarantor")
-
-main_workbook.save("OUTPUT/Summary.xls")
-
-
-# Missing Values: Count for loan numbers without borrower name
-
-
-def get_loan_without_borrower_name():
-    loan_without_borrower_name = """select count(*) from (select distinct on(LN.loan_number) loan_number from ibrd_ug.loan LN, ibrd_ug.borrower B where LN.fk_borrower_id=B.borrower_id and borrower = '') AS TEMP"""
-
-    cur.execute(loan_without_borrower_name)
-    avg_rows = cur.fetchall()
-
-    return avg_rows
-
-
-rowsmissingb = get_loan_without_borrower_name()
-avg_header = ["Total Count", ""]
-generate_excel(avg_header, rowsmissingb, main_workbook, "Missing Borrower")
-
-main_workbook.save("OUTPUT/Summary.xls")
-# Excel Workbook build set up
-
-
-# Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('G2', chart1, {'x_offset': 25, 'y_offset': 10})
-
-workbook.close()
+main_workbook.save("OUTPUT/OUTPUT SUMMARY.xls")
 
 # Email notifier to the supplier of the data with link to SFTP directory with the results
 
@@ -767,7 +798,3 @@ send_email("develop.emailer@gmail.com", message_body)
 print("Email Sent")
 
 ######
-# REST OF CODE
-
-
-# REST OF CODE
