@@ -15,12 +15,13 @@ CREATE TABLE ibrd_ug.country
 
 CREATE TABLE ibrd_ug.data_loading_log
 (
-   log_id             serial      NOT NULL,
+   log_id             serial    NOT NULL,
    file_name          text,
-   time_started       timestamp,
-   time_finished      timestamp,
-   records_processed  text
+   records_processed  text,
+   time_started       varchar,
+   time_finished      varchar
 );
+
 
 CREATE TABLE ibrd_ug.guarantor
 (

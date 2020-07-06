@@ -770,10 +770,57 @@ def get_total_loan_statuses():
 
 rowstatuses = get_total_loan_statuses()
 avg_header = ["Loan Status", "Total Count"]
-generate_excel(avg_header, rowstatuses, main_workbook, "loan_statuses")
+#generate_excel(avg_header, rowstatuses, main_workbook, "loan_statuses")
 
-main_workbook.save("OUTPUT/OUTPUT SUMMARY.xls")
+#main_workbook.save("OUTPUT/OUTPUT SUMMARY.xls")
+# THEN THE GRAPH
+amountStatus = {}
+statusShow = [item[0] for item in rowstatuses]
+for item in rowstatuses:
+    if amountStatus.get("loan_status_count"):
+        amountStatus["loan_status_count"].append(item[1])
+    else:
+        amountStatus["loan_status_count"] = [item[1]]
 
+workbook = xlsxwriter.Workbook(
+    'OUTPUT/GRAPH FOR LOAN STATUSES AND COUNTS.xlsx')
+worksheet = workbook.add_worksheet()
+bold = workbook.add_format({'bold': .5})
+
+# Add the worksheet data that the charts will refer to.
+headings = ['Loan Status', 'Total Count']
+data = [
+    statusShow,  # loan_status
+    amountStatus["loan_status_count"],  # loan_status_count
+]
+
+worksheet.write_row('A1', headings, bold)
+worksheet.write_column('A2', data[0])
+worksheet.write_column('B2', data[1])
+
+# Create a new chart object. In this case an embedded chart.
+chart1 = workbook.add_chart({'type': 'line'})
+
+# Configure the first series.
+chart1.add_series({
+    'name':       '=Sheet1!$B$1',
+    'categories': '=Sheet1!$A$2:$A$11',
+    'values':     '=Sheet1!$B$2:$B$11',
+})
+
+
+# Add a chart title and some axis labels.
+chart1.set_title(
+    {'name': 'Graph Reprensting All Loan Statuses and their total count'})
+chart1.set_x_axis({'name': 'Countries'})
+chart1.set_y_axis({'name': 'Amount'})
+
+# Set an Excel chart style. Colors with white outline and shadow.
+chart1.set_style(10)
+# Insert the chart into the worksheet (with an offset).
+worksheet.insert_chart('E2', chart1, {'x_offset': 25, 'y_offset': 10})
+
+workbook.close()
 # Email notifier to the supplier of the data with link to SFTP directory with the results
 
 
