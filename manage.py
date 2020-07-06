@@ -18,178 +18,7 @@ except psycopg2.DatabaseError as err:
     print('Error %s' % err)
 
 # data supplier is PI would name file with date and name as (YYYYMMDDD_ibrd.csv)
-csv_filename = 'ibrd.csv'
-cur.execute(
-    "insert into data_loading_log(file_name, time_started) values ('%s', now())" % csv_filename)
-conn.commit()
-# get most recent log id
-cur.execute("select max(log_id) from data_loading_log")
-result = cur.fetchone()
-log_id = result[0]
-reader = csv.reader(open(csv_filename, 'r'), delimiter=',')
-num_of_rows = 0
-for index, row in enumerate(reader):
-    if index == 0:
-        continue
 
-    region_name = row[2].replace("'", "")
-    country_code = row[3]
-    country_name = row[4].replace("'", "")
-    borrower = row[5].replace("'", "")
-    guarantor_country_code = row[6]
-    guarantor_name = row[7].replace("'", "")
-    loan_number = row[1]
-    loan_type = row[8]
-    loan_status = row[9]
-    end_of_period = row[0]
-    interest_rate = row[10]
-    currencyof_commitment = row[11]
-    project_id = row[12]
-    project_name = row[13].replace("'", "")
-    original_principal_amount = row[14]
-    cancelled_amount = row[15]
-    undisbursed_amount = row[16]
-    disbursed_amount = row[17]
-    repaid_to_ibrd = row[18]
-    due_to_ibrd = row[19]
-    exchange_adjustment = row[20]
-    borrowers_obligation = [21]
-    sold_3rd_party = row[22]
-    repaid_3rd_party = row[23]
-    due_3rd_party = row[24]
-    loans_held = row[25]
-    first_repayment_date = row[26]
-    last_repayment_date = row[27]
-    agreement_signing_date = row[28]
-    board_approval_date = row[29]
-    effective_date_most_recent = row[30]
-    closed_date_most_recent = row[31]
-    last_disbursement_date = row[32]
-    # Region
-# REGION
-    try:
-        get_region = "Select region_id from region where region_name ilike '%s'" % region_name
-        cur.execute(get_region)
-        result = cur.fetchone()
-
-        if result:
-            region_id = result[0]
-        else:  # region doesnt exist yet, create it
-            insert_region = "INSERT INTO region (region_name) VALUES ('%s')" % region_name
-            cur.execute(insert_region)
-            conn.commit()
-
-            # fetch after insert
-            cur.execute(get_region)
-            result = cur.fetchone()
-            region_id = result[0]
-            print("Created Region ID: ", region_id)
-
-    except Exception as err:
-        print("Region Error Occurred: ", err)
-
-    # COUNTRY
-    try:
-        get_ctry = "select country_id from country where country_name ilike '%s'" % country_name
-        cur.execute(get_ctry)
-        result = cur.fetchone()
-
-        if result:
-            ctry_id = result[0]
-        else:  # country doesnt exist yet, create it
-            insert_country = "INSERT INTO country (country_name, country_code, fk_region_id) VALUES ('%s', '%s', %d)" % (
-                country_name, country_code, region_id)
-            cur.execute(insert_country)
-            conn.commit()
-
-            # fetch after insert
-            cur.execute(get_ctry)
-            result = cur.fetchone()
-            ctry_id = result[0]
-            print("Created Country ID: ", ctry_id)
-
-    except Exception as err:
-        print("Country Error Occurred: ", err)
-
-    # BORROWER
-    try:
-        get_borrower = "select borrower_id from borrower where borrower ilike '%s'" % borrower
-        cur.execute(get_borrower)
-        result = cur.fetchone()
-
-        if result:
-            borrower_id = result[0]
-        else:  # borrower doesnt exist yet, create it
-            insert_borrower = "INSERT INTO borrower (borrower, borrowers_obligation) VALUES ('%s', '%s')" % (
-                borrower, borrowers_obligation)
-            cur.execute(insert_borrower)
-            conn.commit()
-
-            # fetch after insert
-            cur.execute(get_borrower)
-            result = cur.fetchone()
-            borrower_id = result[0]
-            print("Created Borrower ID: ", borrower_id)
-
-    except Exception as err:
-        print("Borrower Error Occurred: ", err)
-
-    # GUARANTOR
-    try:
-        get_guarantor = "select guarantor_id from guarantor where guarantor ilike '%s'" % guarantor_name
-        cur.execute(get_guarantor)
-        result = cur.fetchone()
-
-        if result:
-            guarantor_id = result[0]
-        else:  # guarantor doesnt exist yet, create it
-            insert_country = "INSERT INTO guarantor (guarantor, guarantor_country_code) VALUES ('%s', '%s')" % (
-                guarantor_name, guarantor_country_code)
-            guarantor_id = cur.execute(insert_country)
-            conn.commit()
-
-            # fetch after insert
-            cur.execute(get_guarantor)
-            result = cur.fetchone()
-            guarantor_id = result[0]
-            print("Created Guarantor ID: ", guarantor_id)
-
-    except Exception as err:
-        print("Guarantor Error Occurred: ", err)
-   # LOAN
-    try:
-        insert_loan = """INSERT INTO loan (loan_number, loan_status, loan_type,
-            fk_borrower_id, fk_region_id, fk_guarantor_id, fk_country_id) VALUES
-            ('%s', '%s', '%s', %d, %d, %d, %d)""" % (loan_number, loan_status, loan_type, borrower_id, region_id, guarantor_id, ctry_id)
-        cur.execute(insert_loan)
-        conn.commit()
-        # fetch most recent loan entry just created. Since there are monthly insertions with same loan number
-        get_loan = """select max(loan_id) from loan where loan_number ilike '%s'""" % loan_number
-        cur.execute(get_loan)
-        result = cur.fetchone()
-        loan_id = result[0]
-
-    except Exception as err:
-        print("Loan Error Occurred: ", err)
-
-        # LOAN DETAILS
-    try:
-        insert_details = """insert into loan_details (fk_loan_id,end_of_period,interest_rate,currencyof_commitment,project_id,project_name,original_principal_amount,cancelled_amount,undisbursed_amount,disbursed_amount,repaid_to_ibrd,due_to_ibrd,exchange_adjustment,sold_3rd_party,repaid_3rd_party,due_3rd_party,first_repayment_date,last_repayment_date,agreement_signing_date,board_approval_date,effective_date_most_recent,closed_date_most_recent,last_disbursement_date,loans_held) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" % (
-            loan_id, end_of_period, interest_rate, currencyof_commitment, project_id, project_name, original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount, repaid_to_ibrd, due_to_ibrd, exchange_adjustment, sold_3rd_party, repaid_3rd_party, due_3rd_party, first_repayment_date, last_repayment_date, agreement_signing_date, board_approval_date, effective_date_most_recent, closed_date_most_recent, last_disbursement_date, loans_held)
-        cur.execute(insert_details)
-        conn.commit()
-
-    except:
-        print("Loan Details Error Occurred: ", err)
-
-    num_of_rows += 1
-    print(num_of_rows)
-# if index > 7:
-#   exit()
-# update after process ends
-cur.execute(
-    "update data_loading_log set time_finished = now(), records_processed = %d where log_id = %d" % (num_of_rows, log_id))
-conn.commit()
 
 # Excel Workbook build set up
 
@@ -514,7 +343,90 @@ worksheet.write_column('K2', data[10])
 worksheet.write_column('L2', data[11])
 
 workbook.close()
+# GRAPH HERE
 
+# Averages for Original Principal Amount, Cancelled Amount, Undisbursed Amount, Disbursed Amount
+
+
+amount = {}
+countries = [item[0] for item in rows]
+for item in rows:
+    if amount.get("original_principal_amount"):
+        amount["original_principal_amount"].append(item[1])
+    else:
+        amount["original_principal_amount"] = [item[1]]
+for item in rowsC:
+    if amount.get("cancelled_amount"):
+        amount["cancelled_amount"].append(item[1])
+    else:
+        amount["cancelled_amount"] = [item[1]]
+for item in rowsU:
+    if amount.get("undisbursed_amount"):
+        amount["undisbursed_amount"].append(item[1])
+    else:
+        amount["undisbursed_amount"] = [item[1]]
+for item in rowsD:
+    if amount.get("disbursed_amount"):
+        amount["disbursed_amount"].append(item[1])
+    else:
+        amount["disbursed_amount"] = [item[1]]
+
+workbook = xlsxwriter.Workbook('OUTPUT/AVERAGES.xlsx')
+worksheet = workbook.add_worksheet()
+bold = workbook.add_format({'bold': .5})
+
+# Add the worksheet data that the charts will refer to.
+headings = ['Country', 'Original Principal Amount',
+            'Cancelled Amount', 'Undisbursed Amount', 'Disbursed Amount']
+data = [
+    countries,  # countries
+    amount["original_principal_amount"],  # original_principal_amount
+    amount["cancelled_amount"],  # cancelled_amount
+    amount["undisbursed_amount"],  # undisbursed_amount
+    amount["disbursed_amount"],  # disbursed_amount
+]
+
+worksheet.write_row('A1', headings, bold)
+worksheet.write_column('A2', data[0])
+worksheet.write_column('B2', data[1])
+worksheet.write_column('C2', data[2])
+worksheet.write_column('D2', data[3])
+worksheet.write_column('E2', data[4])
+
+# Create a new chart object. In this case an embedded chart.
+chart1 = workbook.add_chart({'type': 'line'})
+
+# Configure the first series.
+chart1.add_series({
+    'name':       '=Sheet1!$B$1',
+    'categories': '=Sheet1!$A$2:$A$149',
+    'values':     '=Sheet1!$B$2:$B$149',
+})
+
+# Configure a second series. Note use of alternative syntax to define ranges.
+chart1.add_series({
+    'name':       '=Sheet1!$C$1',
+    'categories': '=Sheet1!$A1$2:$A$149',
+    'values':     '=Sheet1!$C$2:$C$149',
+})
+chart1.add_series({
+    'name':       '=Sheet1!$D$1',
+    'categories': '=Sheet1!$A1$2:$A$149',
+    'values':     '=Sheet1!$D$2:$D$149',
+})
+chart1.add_series({
+    'name':       '=Sheet1!$E$1',
+    'categories': '=Sheet1!$A1$2:$A$149',
+    'values':     '=Sheet1!$E$2:$E$149',
+})
+# Add a chart title and some axis labels.
+chart1.set_title(
+    {'name': 'Graph Reprensting the average Original Principal Amount, Cancelled Amount, Undisbursed Amount and Disbursed Amount (Expand graph to view all results'})
+chart1.set_x_axis({'name': 'Countries'})
+chart1.set_y_axis({'name': 'Amount'})
+
+# Set an Excel chart style. Colors with white outline and shadow.
+chart1.set_style(10)
 # Loans taked by each Country
 
 
@@ -654,98 +566,6 @@ generate_excel(avg_header, rowsmissingb, main_workbook, "Missing Borrower")
 main_workbook.save("OUTPUT/Summary.xls")
 # Excel Workbook build set up
 
-# Averages for Original Principal Amount, Cancelled Amount, Undisbursed Amount, Disbursed Amount
-
-
-def get_averages_per_count():
-    average_principal_per_ = """select distinct on(TEMP.country_name) Temp.country_name, avg(TEMP.original_principal_amount), avg(cancelled_amount), avg(undisbursed_amount), avg(disbursed_amount) from
-        (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount from
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
-        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name, original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount"""
-
-    cur.execute(average_principal_per_)
-    avg_rows = cur.fetchall()
-    return avg_rows
-
-
-rows = get_averages_per_count()
-
-amount = {}
-countries = [item[0] for item in rows]
-for item in rows:
-    if amount.get("original_principal_amount"):
-        amount["original_principal_amount"].append(item[1])
-    else:
-        amount["original_principal_amount"] = [item[1]]
-    if amount.get("cancelled_amount"):
-        amount["cancelled_amount"].append(item[2])
-    else:
-        amount["cancelled_amount"] = [item[2]]
-    if amount.get("undisbursed_amount"):
-        amount["undisbursed_amount"].append(item[3])
-    else:
-        amount["undisbursed_amount"] = [item[3]]
-    if amount.get("disbursed_amount"):
-        amount["disbursed_amount"].append(item[4])
-    else:
-        amount["disbursed_amount"] = [item[4]]
-
-workbook = xlsxwriter.Workbook('OUTPUT/AVERAGES.xlsx')
-worksheet = workbook.add_worksheet()
-bold = workbook.add_format({'bold': .5})
-
-# Add the worksheet data that the charts will refer to.
-headings = ['Country', 'Original Principal Amount',
-            'Cancelled Amount', 'Undisbursed Amount', 'Disbursed Amount']
-data = [
-    countries,  # countries
-    amount["original_principal_amount"],  # original_principal_amount
-    amount["cancelled_amount"],  # cancelled_amount
-    amount["undisbursed_amount"],  # undisbursed_amount
-    amount["disbursed_amount"],  # disbursed_amount
-]
-
-worksheet.write_row('A1', headings, bold)
-worksheet.write_column('A2', data[0])
-worksheet.write_column('B2', data[1])
-worksheet.write_column('C2', data[2])
-worksheet.write_column('D2', data[3])
-worksheet.write_column('E2', data[4])
-
-# Create a new chart object. In this case an embedded chart.
-chart1 = workbook.add_chart({'type': 'line'})
-
-# Configure the first series.
-chart1.add_series({
-    'name':       '=Sheet1!$B$1',
-    'categories': '=Sheet1!$A$2:$A$149',
-    'values':     '=Sheet1!$B$2:$B$149',
-})
-
-# Configure a second series. Note use of alternative syntax to define ranges.
-chart1.add_series({
-    'name':       '=Sheet1!$C$1',
-    'categories': '=Sheet1!$A1$2:$A$149',
-    'values':     '=Sheet1!$C$2:$C$149',
-})
-chart1.add_series({
-    'name':       '=Sheet1!$D$1',
-    'categories': '=Sheet1!$A1$2:$A$149',
-    'values':     '=Sheet1!$D$2:$D$149',
-})
-chart1.add_series({
-    'name':       '=Sheet1!$E$1',
-    'categories': '=Sheet1!$A1$2:$A$149',
-    'values':     '=Sheet1!$E$2:$E$149',
-})
-# Add a chart title and some axis labels.
-chart1.set_title(
-    {'name': 'Graph Reprensting the average Original Principal Amount, Cancelled Amount, Undisbursed Amount and Disbursed Amount (Expand graph to view all results'})
-chart1.set_x_axis({'name': 'Countries'})
-chart1.set_y_axis({'name': 'Amount'})
-
-# Set an Excel chart style. Colors with white outline and shadow.
-chart1.set_style(10)
 
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('G2', chart1, {'x_offset': 25, 'y_offset': 10})
