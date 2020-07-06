@@ -226,7 +226,7 @@ rowsprocessed = get_process_summary()
 avg_header = ["File Name", "Time Started",
               "Fime_Finished", "Records Rrocessed"]
 generate_excel(avg_header, rowsprocessed, main_workbook, "Process Summary")
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 
 # # Average for original_principal_amount
@@ -266,7 +266,7 @@ rows = get_averages_cancelled_amount_per_country()
 avg_header = ["Country", "Average Cancelled"]
 generate_excel(avg_header, rows, main_workbook, "Cancelled_Amount_Per_Country")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Average for undisbursed_amount
 
@@ -287,7 +287,7 @@ rows = get_averages_undisbursed_amount_per_country()
 avg_header = ["Country", "Undisbursed Amount"]
 generate_excel(avg_header, rows, main_workbook, "undisbursed_amount")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Average for disbursed_amount
 
@@ -308,7 +308,7 @@ rows = get_averages_disbursed_amount_per_country()
 avg_header = ["Country", "Disbursed Amount"]
 generate_excel(avg_header, rows, main_workbook, "disbursed_amount")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Average for repaid_to_ibrd
 
@@ -329,7 +329,7 @@ rows = get_averages_repaid_to_ibrd_per_country()
 avg_header = ["Country", "Repaid To IBRD"]
 generate_excel(avg_header, rows, main_workbook, "repaid_to_ibrd")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Average for due_to_ibrd
 
@@ -350,7 +350,7 @@ rows = get_averages_due_to_ibrd_per_country()
 avg_header = ["Country", "Due To IBRD"]
 generate_excel(avg_header, rows, main_workbook, "due_to_ibrd")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Average for exchange_adjustment
 
@@ -371,7 +371,7 @@ rows = get_averages_exchange_adjustment_per_country()
 avg_header = ["Country", "Exchange Adjustments"]
 generate_excel(avg_header, rows, main_workbook, "exchange_adjustment")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Average for sold_3rd_party
 
@@ -392,7 +392,7 @@ rows = get_averages_sold_3rd_party_per_country()
 avg_header = ["Country", "Sold 3rd Party"]
 generate_excel(avg_header, rows, main_workbook, "sold_3rd_party")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Average for repaid_3rd_party
 
@@ -413,7 +413,7 @@ rows = get_averages_repaid_3rd_party_per_country()
 avg_header = ["Country", "Repaid 3rd Party"]
 generate_excel(avg_header, rows, main_workbook, "repaid_3rd_party")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 
 # Average for due_3rd_party
@@ -435,7 +435,7 @@ rows = get_averages_due_3rd_party_per_country()
 avg_header = ["Country", "Due 3rd Party"]
 generate_excel(avg_header, rows, main_workbook, "due_3rd_party")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 # Average for loans_held
 
 
@@ -455,7 +455,7 @@ rows = get_averages_loans_held_per_country()
 avg_header = ["Country", "Loans Held"]
 generate_excel(avg_header, rows, main_workbook, "loans_held")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Loans taked by each Country
 
@@ -476,7 +476,7 @@ rows = get_total_loan_per_ctry()
 avg_header = ["Country", "Total Loans Per Country"]
 generate_excel(avg_header, rows, main_workbook, "total_loans")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 # Maximum amount taken by a country
 
 
@@ -496,7 +496,7 @@ rows = get_max_loan_per_ctry()
 avg_header = ["Country", "Maximum Disbursed Amount"]
 generate_excel(avg_header, rows, main_workbook, "maximum_disbursed_amount")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Minimum amount taken by a country
 
@@ -517,7 +517,7 @@ rows = get_min_loan_per_ctry()
 avg_header = ["Country", "Minimum Disbursed Amount"]
 generate_excel(avg_header, rows, main_workbook, "minimum_disbursed_amount")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 
 # All Loan types submitted in current raw file
@@ -536,7 +536,7 @@ rowstypes = get_total_loan_types()
 avg_header = ["Loan Types", ""]
 generate_excel(avg_header, rowstypes, main_workbook, "loan_types")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 # Count for all Loan statuses in file
 
@@ -555,7 +555,7 @@ rowstatuses = get_total_loan_statuses()
 avg_header = ["Loan Status", "Total Count"]
 generate_excel(avg_header, rowstatuses, main_workbook, "loan_statuses")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 
 # Missing Values: Count for loan numbers without guarantor
@@ -574,7 +574,7 @@ rowsmissing = get_loan_without_guarantor()
 avg_header = ["Total Count", ""]
 generate_excel(avg_header, rowsmissing, main_workbook, "Missing Guarantor")
 
-main_workbook.save("OUTPUT/Summary.xls")
+main_workbook.save("Summary.xls")
 
 
 # Missing Values: Count for loan numbers without borrower name
@@ -593,108 +593,7 @@ rowsmissingb = get_loan_without_borrower_name()
 avg_header = ["Total Count", ""]
 generate_excel(avg_header, rowsmissingb, main_workbook, "Missing Borrower")
 
-main_workbook.save("OUTPUT/Summary.xls")
-# Excel Workbook build set up
-
-# Averages for Original Principal Amount, Cancelled Amount, Undisbursed Amount, Disbursed Amount
-
-
-def get_averages_per_count():
-    average_principal_per_ = """select distinct on(TEMP.country_name) Temp.country_name, avg(TEMP.original_principal_amount), avg(cancelled_amount), avg(undisbursed_amount), avg(disbursed_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
-        C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name, original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount"""
-
-    cur.execute(average_principal_per_)
-    avg_rows = cur.fetchall()
-    return avg_rows
-
-
-rows = get_averages_per_count()
-
-amount = {}
-countries = [item[0] for item in rows]
-for item in rows:
-    if amount.get("original_principal_amount"):
-        amount["original_principal_amount"].append(item[1])
-    else:
-        amount["original_principal_amount"] = [item[1]]
-    if amount.get("cancelled_amount"):
-        amount["cancelled_amount"].append(item[2])
-    else:
-        amount["cancelled_amount"] = [item[2]]
-    if amount.get("undisbursed_amount"):
-        amount["undisbursed_amount"].append(item[3])
-    else:
-        amount["undisbursed_amount"] = [item[3]]
-    if amount.get("disbursed_amount"):
-        amount["disbursed_amount"].append(item[4])
-    else:
-        amount["disbursed_amount"] = [item[4]]
-
-workbook = xlsxwriter.Workbook('OUTPUT/AVERAGES.xlsx')
-worksheet = workbook.add_worksheet()
-bold = workbook.add_format({'bold': .5})
-
-# Add the worksheet data that the charts will refer to.
-headings = ['Country', 'Original Principal Amount',
-            'Cancelled Amount', 'Undisbursed Amount', 'Disbursed Amount']
-data = [
-    countries,  # countries
-    amount["original_principal_amount"],  # original_principal_amount
-    amount["cancelled_amount"],  # cancelled_amount
-    amount["undisbursed_amount"],  # undisbursed_amount
-    amount["disbursed_amount"],  # disbursed_amount
-]
-
-worksheet.write_row('A1', headings, bold)
-worksheet.write_column('A2', data[0])
-worksheet.write_column('B2', data[1])
-worksheet.write_column('C2', data[2])
-worksheet.write_column('D2', data[3])
-worksheet.write_column('E2', data[4])
-
-# Create a new chart object. In this case an embedded chart.
-chart1 = workbook.add_chart({'type': 'line'})
-
-# Configure the first series.
-chart1.add_series({
-    'name':       '=Sheet1!$B$1',
-    'categories': '=Sheet1!$A$2:$A$149',
-    'values':     '=Sheet1!$B$2:$B$149',
-})
-
-# Configure a second series. Note use of alternative syntax to define ranges.
-chart1.add_series({
-    'name':       '=Sheet1!$C$1',
-    'categories': '=Sheet1!$A1$2:$A$149',
-    'values':     '=Sheet1!$C$2:$C$149',
-})
-chart1.add_series({
-    'name':       '=Sheet1!$D$1',
-    'categories': '=Sheet1!$A1$2:$A$149',
-    'values':     '=Sheet1!$D$2:$D$149',
-})
-chart1.add_series({
-    'name':       '=Sheet1!$E$1',
-    'categories': '=Sheet1!$A1$2:$A$149',
-    'values':     '=Sheet1!$E$2:$E$149',
-})
-# Add a chart title and some axis labels.
-chart1.set_title(
-    {'name': 'Graph Reprensting the average Original Principal Amount, Cancelled Amount, Undisbursed Amount and Disbursed Amount (Expand graph to view all results'})
-chart1.set_x_axis({'name': 'Countries'})
-chart1.set_y_axis({'name': 'Amount'})
-
-# Set an Excel chart style. Colors with white outline and shadow.
-chart1.set_style(10)
-
-# Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('G2', chart1, {'x_offset': 25, 'y_offset': 10})
-
-workbook.close()
-
-# Email notifier to the supplier of the data with link to SFTP directory with the results
+main_workbook.save("Summary.xls")
 
 
 def send_email(recepient, msg_body):
