@@ -158,8 +158,8 @@ for index, row in enumerate(reader):
         print("Guarantor Error Occurred: ", err)
    # LOAN
     try:
-        insert_loan = """INSERT INTO loan (loan_number, loan_status, loan_type, 
-            fk_borrower_id, fk_region_id, fk_guarantor_id, fk_country_id) VALUES 
+        insert_loan = """INSERT INTO loan (loan_number, loan_status, loan_type,
+            fk_borrower_id, fk_region_id, fk_guarantor_id, fk_country_id) VALUES
             ('%s', '%s', '%s', %d, %d, %d, %d)""" % (loan_number, loan_status, loan_type, borrower_id, region_id, guarantor_id, ctry_id)
         cur.execute(insert_loan)
         conn.commit()
@@ -230,11 +230,10 @@ main_workbook.save("OUTPUT/Summary.xls")
 
 
 # # Average for original_principal_amount
-
 def get_averages_per_country():
-    average_principal_per_ctry = """select TEMP.country_name, avg(TEMP.original_principal_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_principal_per_ctry = """select TEMP.country_name, avg(TEMP.original_principal_amount) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_principal_per_ctry)
@@ -244,16 +243,14 @@ def get_averages_per_country():
 
 
 rows = get_averages_per_country()
-avg_header = ["Country", "Average Original Principal Amount"]
-generate_excel(avg_header, rows, main_workbook, "Averages_Principal_Amount")
 
 # Average for cancelled_amount
 
 
 def get_averages_cancelled_amount_per_country():
-    average_cancelled_amount_per_ctry = """select TEMP.country_name, avg(TEMP.cancelled_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.cancelled_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_cancelled_amount_per_ctry = """select TEMP.country_name, avg(TEMP.cancelled_amount) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.cancelled_amount from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_cancelled_amount_per_ctry)
@@ -262,19 +259,15 @@ def get_averages_cancelled_amount_per_country():
     return avg_rows
 
 
-rows = get_averages_cancelled_amount_per_country()
-avg_header = ["Country", "Average Cancelled"]
-generate_excel(avg_header, rows, main_workbook, "Cancelled_Amount_Per_Country")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsC = get_averages_cancelled_amount_per_country()
 
 # Average for undisbursed_amount
 
 
 def get_averages_undisbursed_amount_per_country():
-    average_undisbursed_amount_per_ctry = """select TEMP.country_name, avg(TEMP.undisbursed_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.undisbursed_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_undisbursed_amount_per_ctry = """select TEMP.country_name, avg(TEMP.undisbursed_amount) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.undisbursed_amount from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_undisbursed_amount_per_ctry)
@@ -283,19 +276,15 @@ def get_averages_undisbursed_amount_per_country():
     return avg_rows
 
 
-rows = get_averages_undisbursed_amount_per_country()
-avg_header = ["Country", "Undisbursed Amount"]
-generate_excel(avg_header, rows, main_workbook, "undisbursed_amount")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsU = get_averages_undisbursed_amount_per_country()
 
 # Average for disbursed_amount
 
 
 def get_averages_disbursed_amount_per_country():
-    average_disbursed_amount_per_ctry = """select TEMP.country_name, avg(TEMP.disbursed_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_disbursed_amount_per_ctry = """select TEMP.country_name, avg(TEMP.disbursed_amount) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_disbursed_amount_per_ctry)
@@ -304,19 +293,14 @@ def get_averages_disbursed_amount_per_country():
     return avg_rows
 
 
-rows = get_averages_disbursed_amount_per_country()
-avg_header = ["Country", "Disbursed Amount"]
-generate_excel(avg_header, rows, main_workbook, "disbursed_amount")
-
-main_workbook.save("OUTPUT/Summary.xls")
-
+rowsD = get_averages_disbursed_amount_per_country()
 # Average for repaid_to_ibrd
 
 
 def get_averages_repaid_to_ibrd_per_country():
-    average_repaid_to_ibrd_per_ctry = """select TEMP.country_name, avg(TEMP.repaid_to_ibrd) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.repaid_to_ibrd from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_repaid_to_ibrd_per_ctry = """select TEMP.country_name, avg(TEMP.repaid_to_ibrd) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.repaid_to_ibrd from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_repaid_to_ibrd_per_ctry)
@@ -325,19 +309,15 @@ def get_averages_repaid_to_ibrd_per_country():
     return avg_rows
 
 
-rows = get_averages_repaid_to_ibrd_per_country()
-avg_header = ["Country", "Repaid To IBRD"]
-generate_excel(avg_header, rows, main_workbook, "repaid_to_ibrd")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsR = get_averages_repaid_to_ibrd_per_country()
 
 # Average for due_to_ibrd
 
 
 def get_averages_due_to_ibrd_per_country():
-    average_due_to_ibrd_per_ctry = """select TEMP.country_name, avg(TEMP.due_to_ibrd) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.due_to_ibrd from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_due_to_ibrd_per_ctry = """select TEMP.country_name, avg(TEMP.due_to_ibrd) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.due_to_ibrd from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_due_to_ibrd_per_ctry)
@@ -346,19 +326,15 @@ def get_averages_due_to_ibrd_per_country():
     return avg_rows
 
 
-rows = get_averages_due_to_ibrd_per_country()
-avg_header = ["Country", "Due To IBRD"]
-generate_excel(avg_header, rows, main_workbook, "due_to_ibrd")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsDu = get_averages_due_to_ibrd_per_country()
 
 # Average for exchange_adjustment
 
 
 def get_averages_exchange_adjustment_per_country():
-    average_exchange_adjustment_per_ctry = """select TEMP.country_name, avg(TEMP.exchange_adjustment) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.exchange_adjustment from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_exchange_adjustment_per_ctry = """select TEMP.country_name, avg(TEMP.exchange_adjustment) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.exchange_adjustment from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_exchange_adjustment_per_ctry)
@@ -367,19 +343,15 @@ def get_averages_exchange_adjustment_per_country():
     return avg_rows
 
 
-rows = get_averages_exchange_adjustment_per_country()
-avg_header = ["Country", "Exchange Adjustments"]
-generate_excel(avg_header, rows, main_workbook, "exchange_adjustment")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsE = get_averages_exchange_adjustment_per_country()
 
 # Average for sold_3rd_party
 
 
 def get_averages_sold_3rd_party_per_country():
-    average_sold_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.sold_3rd_party) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.sold_3rd_party from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_sold_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.sold_3rd_party) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.sold_3rd_party from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_sold_3rd_party_per_ctry)
@@ -388,19 +360,15 @@ def get_averages_sold_3rd_party_per_country():
     return avg_rows
 
 
-rows = get_averages_sold_3rd_party_per_country()
-avg_header = ["Country", "Sold 3rd Party"]
-generate_excel(avg_header, rows, main_workbook, "sold_3rd_party")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsS = get_averages_sold_3rd_party_per_country()
 
 # Average for repaid_3rd_party
 
 
 def get_averages_repaid_3rd_party_per_country():
-    average_repaid_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.repaid_3rd_party) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.repaid_3rd_party from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_repaid_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.repaid_3rd_party) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.repaid_3rd_party from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_repaid_3rd_party_per_ctry)
@@ -409,20 +377,16 @@ def get_averages_repaid_3rd_party_per_country():
     return avg_rows
 
 
-rows = get_averages_repaid_3rd_party_per_country()
-avg_header = ["Country", "Repaid 3rd Party"]
-generate_excel(avg_header, rows, main_workbook, "repaid_3rd_party")
-
-main_workbook.save("OUTPUT/Summary.xls")
+rowsRe = get_averages_repaid_3rd_party_per_country()
 
 
 # Average for due_3rd_party
 
 
 def get_averages_due_3rd_party_per_country():
-    average_due_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.due_3rd_party) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.due_3rd_party from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_due_3rd_party_per_ctry = """select TEMP.country_name, avg(TEMP.due_3rd_party) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.due_3rd_party from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_due_3rd_party_per_ctry)
@@ -431,18 +395,15 @@ def get_averages_due_3rd_party_per_country():
     return avg_rows
 
 
-rows = get_averages_due_3rd_party_per_country()
-avg_header = ["Country", "Due 3rd Party"]
-generate_excel(avg_header, rows, main_workbook, "due_3rd_party")
+rowsDue = get_averages_due_3rd_party_per_country()
 
-main_workbook.save("OUTPUT/Summary.xls")
 # Average for loans_held
 
 
 def get_averages_loans_held_per_country():
-    average_loans_held_per_ctry = """select TEMP.country_name, avg(TEMP.loans_held) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.loans_held from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_loans_held_per_ctry = """select TEMP.country_name, avg(TEMP.loans_held) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.loans_held from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(average_loans_held_per_ctry)
@@ -451,19 +412,116 @@ def get_averages_loans_held_per_country():
     return avg_rows
 
 
-rows = get_averages_loans_held_per_country()
-avg_header = ["Country", "Loans Held"]
-generate_excel(avg_header, rows, main_workbook, "loans_held")
+rowsL = get_averages_loans_held_per_country()
 
-main_workbook.save("OUTPUT/Summary.xls")
+
+# ADD AVERAGES TO ONE WORKBOOK
+amountAvg = {}
+countries = [item[0] for item in rows]
+for item in rows:
+    if amountAvg.get("original_principal_amount"):
+        amountAvg["original_principal_amount"].append(item[1])
+    else:
+        amountAvg["original_principal_amount"] = [item[1]]
+
+for item in rowsC:
+    if amountAvg.get("cancelled_amount"):
+        amountAvg["cancelled_amount"].append(item[1])
+    else:
+        amountAvg["cancelled_amount"] = [item[1]]
+for item in rowsU:
+    if amountAvg.get("undisbursed_amount"):
+        amountAvg["undisbursed_amount"].append(item[1])
+    else:
+        amountAvg["undisbursed_amount"] = [item[1]]
+for item in rowsD:
+    if amountAvg.get("disbursed_amount"):
+        amountAvg["disbursed_amount"].append(item[1])
+    else:
+        amountAvg["disbursed_amount"] = [item[1]]
+for item in rowsR:
+    if amountAvg.get("repaid_to_ibrd"):
+        amountAvg["repaid_to_ibrd"].append(item[1])
+    else:
+        amountAvg["repaid_to_ibrd"] = [item[1]]
+for item in rowsDu:
+    if amountAvg.get("due_to_ibrd"):
+        amountAvg["due_to_ibrd"].append(item[1])
+    else:
+        amountAvg["due_to_ibrd"] = [item[1]]
+for item in rowsE:
+    if amountAvg.get("exchange_adjustment"):
+        amountAvg["exchange_adjustment"].append(item[1])
+    else:
+        amountAvg["exchange_adjustment"] = [item[1]]
+for item in rowsS:
+    if amountAvg.get("sold_3rd_party"):
+        amountAvg["sold_3rd_party"].append(item[1])
+    else:
+        amountAvg["sold_3rd_party"] = [item[1]]
+for item in rowsRe:
+    if amountAvg.get("repaid_3rd_party"):
+        amountAvg["repaid_3rd_party"].append(item[1])
+    else:
+        amountAvg["repaid_3rd_party"] = [item[1]]
+for item in rowsDue:
+    if amountAvg.get("due_3rd_party"):
+        amountAvg["due_3rd_party"].append(item[1])
+    else:
+        amountAvg["due_3rd_party"] = [item[1]]
+for item in rowsL:
+    if amountAvg.get("loans_held"):
+        amountAvg["loans_held"].append(item[1])
+    else:
+        amountAvg["loans_held"] = [item[1]]
+
+workbook = xlsxwriter.Workbook(
+    'OUTPUT/SUMMARY FOR AVERAGE AMOUNTS PER COUNTRY.xlsx')
+worksheet = workbook.add_worksheet()
+bold = workbook.add_format({'bold': .5})
+
+# Add the worksheet data that the charts will refer to.
+headings = ['Country', 'Original Principal Amount',
+            'Cancelled Amount', 'Undisbursed Amount', 'Disbursed Amount', 'Repaid To IBRD', 'Due To IBRD', 'Exchange Adjustment', 'Sold 3rd Party', 'Repaid 3rd Party', 'Due 3rd Party', 'Loans Held']
+data = [
+    countries,  # countries
+    amountAvg["original_principal_amount"],  # original_principal_amount
+    amountAvg["cancelled_amount"],  # cancelled_amount
+    amountAvg["undisbursed_amount"],  # undisbursed_amount
+    amountAvg["disbursed_amount"],  # disbursed_amount
+    amountAvg["repaid_to_ibrd"],  # repaid_to_ibrd
+    amountAvg["due_to_ibrd"],  # due_to_ibrd
+    amountAvg["exchange_adjustment"],  # exchange_adjustment
+    amountAvg["sold_3rd_party"],  # sold_3rd_party
+    amountAvg["repaid_3rd_party"],  # repaid_3rd_party
+    amountAvg["due_3rd_party"],  # due_3rd_party
+    amountAvg["loans_held"],  # loans_held
+]
+
+
+worksheet.write_row('A1', headings, bold)
+worksheet.write_column('A2', data[0])
+worksheet.write_column('B2', data[1])
+worksheet.write_column('C2', data[2])
+worksheet.write_column('D2', data[3])
+worksheet.write_column('E2', data[4])
+worksheet.write_column('F2', data[5])
+worksheet.write_column('G2', data[6])
+worksheet.write_column('H2', data[7])
+worksheet.write_column('I2', data[8])
+worksheet.write_column('J2', data[9])
+worksheet.write_column('K2', data[10])
+worksheet.write_column('L2', data[11])
+
+workbook.close()
 
 # Loans taked by each Country
 
 
 def get_total_loan_per_ctry():
-    total_loan_per_ctry = """select TEMP.country_name, count(TEMP.loan_number) from 
-        (select distinct on(LN.loan_number) C.country_name, LN.loan_number from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN where 
+    total_loan_per_ctry = """select TEMP.country_name, count(TEMP.loan_number) from
+        (select distinct on(LN.loan_number) C.country_name, LN.loan_number from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN where
         C.country_id=LN.fk_country_id) AS TEMP group by country_name"""
 
     cur.execute(total_loan_per_ctry)
@@ -481,9 +539,9 @@ main_workbook.save("OUTPUT/Summary.xls")
 
 
 def get_max_loan_per_ctry():
-    max_loan_per_ctry = """select TEMP.country_name, max(TEMP.disbursed_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    max_loan_per_ctry = """select TEMP.country_name, max(TEMP.disbursed_amount) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(max_loan_per_ctry)
@@ -502,9 +560,9 @@ main_workbook.save("OUTPUT/Summary.xls")
 
 
 def get_min_loan_per_ctry():
-    min_loan_per_ctry = """select TEMP.country_name, min(TEMP.disbursed_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    min_loan_per_ctry = """select TEMP.country_name, min(TEMP.disbursed_amount) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.disbursed_amount from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name"""
 
     cur.execute(min_loan_per_ctry)
@@ -600,9 +658,9 @@ main_workbook.save("OUTPUT/Summary.xls")
 
 
 def get_averages_per_count():
-    average_principal_per_ = """select distinct on(TEMP.country_name) Temp.country_name, avg(TEMP.original_principal_amount), avg(cancelled_amount), avg(undisbursed_amount), avg(disbursed_amount) from 
-        (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount from 
-        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where 
+    average_principal_per_ = """select distinct on(TEMP.country_name) Temp.country_name, avg(TEMP.original_principal_amount), avg(cancelled_amount), avg(undisbursed_amount), avg(disbursed_amount) from
+        (select distinct on(LN.loan_number) C.country_name,  LD.original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount from
+        ibrd_ug.COUNTRY C, ibrd_ug.LOAN LN, ibrd_ug.LOAN_DETAILS LD where
         C.country_id=LN.fk_country_id and LD.fk_loan_id=LN.loan_id) AS TEMP group by country_name, original_principal_amount, cancelled_amount, undisbursed_amount, disbursed_amount"""
 
     cur.execute(average_principal_per_)
@@ -715,3 +773,10 @@ def send_email(recepient, msg_body):
 
 message_body = "Good day, \nYour recent monthly file has been processed successfully.\nRefer to the SFTP directory for results. \n\n Regards\n Data Team"
 send_email("develop.emailer@gmail.com", message_body)
+print("Email Sent")
+
+######
+# REST OF CODE
+
+
+# REST OF CODE
