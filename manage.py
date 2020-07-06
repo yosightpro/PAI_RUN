@@ -606,7 +606,7 @@ def send_email(recepient, msg_body):
     # smtp.gmail.com is gmails mail server, Compuscans would need to use its own
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    server.login('develop.emailer@gmail.com', 'fordevelop22')
+    server.login('develop.emailer@gmail.com', 'testdevelop20')
     server.sendmail('develop.emailer@gmail.com', recepient, msg.as_string())
     server.quit()
 
