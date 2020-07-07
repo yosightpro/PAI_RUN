@@ -18,7 +18,7 @@ except psycopg2.DatabaseError as err:
     print('Error %s' % err)
 
 # data supplier is PI would name file with date and name as (YYYYMMDDD_ibrd.csv)
-csv_filename = 'ibrd.csv'
+csv_filename = 'ibrd-statement-of-loans-latest-available-snapshot.csv'
 cur.execute(
     "insert into data_loading_log(file_name, time_started) values ('%s', now())" % csv_filename)
 conn.commit()
@@ -31,7 +31,7 @@ num_of_rows = 0
 for index, row in enumerate(reader):
     if index == 0:
         continue
-
+# Initialize Rows
     region_name = row[2].replace("'", "")
     country_code = row[3]
     country_name = row[4].replace("'", "")
@@ -65,7 +65,9 @@ for index, row in enumerate(reader):
     effective_date_most_recent = row[30]
     closed_date_most_recent = row[31]
     last_disbursement_date = row[32]
-    # Region
+
+# DISTRIBUTE DATA TO ALL TABLES
+
 # REGION
     try:
         get_region = "Select region_id from region where region_name ilike '%s'" % region_name
@@ -554,7 +556,7 @@ worksheet.write_column('K2', data[10])
 worksheet.write_column('L2', data[11])
 
 workbook.close()
-# GRAPH HERE
+
 
 # Averages for Original Principal Amount, Cancelled Amount, Undisbursed Amount, Disbursed Amount
 
@@ -581,6 +583,8 @@ for item in rowsD:
         amount["disbursed_amount"].append(item[1])
     else:
         amount["disbursed_amount"] = [item[1]]
+
+# GRAPH HERE
 
 workbook = xlsxwriter.Workbook('OUTPUT/GRAPH FOR AMOUNT AVERAGES.xlsx')
 worksheet = workbook.add_worksheet()
@@ -615,6 +619,7 @@ chart1.add_series({
 })
 
 # Configure a second series. Note use of alternative syntax to define ranges.
+# Series are the different columns to be plotted on the line Graph
 chart1.add_series({
     'name':       '=Sheet1!$C$1',
     'categories': '=Sheet1!$A1$2:$A$149',
@@ -821,6 +826,7 @@ chart1.set_style(10)
 worksheet.insert_chart('E2', chart1, {'x_offset': 25, 'y_offset': 10})
 
 workbook.close()
+
 # Email notifier to the supplier of the data with link to SFTP directory with the results
 
 
