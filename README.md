@@ -14,3 +14,7 @@ TOOLS AND RESOURCES USED:
 •	PostgresSQL
 •	SQL WorkBench
 
+Additional notes:
+
+Raw file is maintained in the home directory
+Use email Logins of SMTP to access sample emails sent out after the file is loaded into the database
