@@ -1,6 +1,7 @@
 # PAI_RUN
  PAI
 
+NOTE: To start service run the Manage.py script file. Manage.py is the main file that starts and stops the service. 
 
 The system is designed to read a CSV file sent in on a monthly basis. The file is intended to be loaded in a pre-existing database with multiple tables. Python being the key programming language for this solution, the file is expected to be broken down and loaded in multiple tables under one schema IBRD_UG. 
 
@@ -12,3 +13,4 @@ TOOLS AND RESOURCES USED:
 •	PG Admin 4
 •	PostgresSQL
 •	SQL WorkBench
+
